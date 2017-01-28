@@ -17,7 +17,7 @@ import org.dreambot.api.wrappers.items.GroundItem;
 
 @ScriptManifest(author = "GanjaSmuggler", category = Category.WOODCUTTING, name = "Ganja Woodcutter", description = "Chop any tree anywhere. Just start and fill the blank with tree names (e.g. Oak ,Willow ,Yew) then choose either drop or bank.", version = 1.0)
 public class GanjaWoodcutterMain extends AbstractScript {
-    public static final String VERSION = "2.3.5";
+    public static final String VERSION = "2.3.6";
 
     private boolean isStarted = false;
     private boolean drop = true;
@@ -94,6 +94,11 @@ public class GanjaWoodcutterMain extends AbstractScript {
                         tree = getGameObjects().closest(gameObject -> (treeDistance <= 0 || gameObject.distance(startTile) < treeDistance) && gameObject.getName().equalsIgnoreCase(woodList.get(Calculations.random(woodList.size()))));
                     }
 
+                    if (getRandomManager().isSolving()) {
+                        chopping = false;
+                        tree = null;
+                    }
+
                     if (tree != null && !chopping && !getLocalPlayer().isMoving() && tree.interact("Chop down")) {
                         if (randMouseMovs)
                             getMouse().move();
@@ -101,16 +106,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                         chopping = true;
                     }
 
-                    if (tree == null && chopping) {
-                        chopping = false;
-                    }
-
                     if (tree != null && chopping && !getInventory().isFull() && tree.exists()) {
-                        // if (getDialogues().canContinue()) {
-                        //    AbstractScript.log("In dialogue");
-                        //    getDialogues().spaceToContinue();
-                        // }
-
                         if (getLocalPlayer().isStandingStill()) {
                             tree.interact("Chop down");
                             getMouse().move();
