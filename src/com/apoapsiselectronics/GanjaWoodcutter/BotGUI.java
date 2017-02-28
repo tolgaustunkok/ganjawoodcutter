@@ -201,7 +201,7 @@ public class BotGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String message = taFeedback.getText();
             taFeedback.setText("");
-            context.getFeedback().SendString(message, context.getClient().getUsername());
+            context.getFeedback().SendString(message, "unknown");
         }
     }
 

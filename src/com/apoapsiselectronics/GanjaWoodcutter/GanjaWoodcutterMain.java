@@ -17,7 +17,8 @@ import org.dreambot.api.wrappers.items.GroundItem;
 
 @ScriptManifest(author = "GanjaSmuggler", category = Category.WOODCUTTING, name = "Ganja Woodcutter", description = "Chop any tree anywhere. Just start and fill the blank with tree names (e.g. Oak ,Willow ,Yew) then choose either drop or bank.", version = 1.0)
 public class GanjaWoodcutterMain extends AbstractScript {
-    public static final String VERSION = "2.3.6";
+    public static final String VERSION = "2.3.7";
+    public static boolean DEBUG = false;
 
     private boolean isStarted = false;
     private boolean drop = true;
@@ -43,6 +44,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
     private Tile startTile = null;
     private Feedback feedback;
     private Antiban antiban;
+    private static int standingStill;
 
     @Override
     public void onStart() {
@@ -58,7 +60,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
     public int onLoop() {
         switch (currentState) {
             case START:
-                log("START");
+                if (DEBUG) log("START");
                 if (isStarted) {
                     timer.reset();
                     getSkillTracker().start();
@@ -69,7 +71,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                     currentState = BotStates.START;
                 break;
             case CHECK_INV:
-                log("CHECK_INV");
+                if (DEBUG) log("CHECK_INV");
                 if (isStarted) {
                     if (getInventory().isFull())
                         currentState = BotStates.DROP_OR_BANK;
@@ -78,7 +80,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                 }
                 break;
             case CUT_TREE:
-                log("CUT_TREE");
+                if (DEBUG) log("CUT_TREE");
                 if (isStarted) {
                     if (takeBirdNests && chopping) {
                         GroundItem birdNest = getGroundItems().closest("Bird nest");
@@ -94,9 +96,10 @@ public class GanjaWoodcutterMain extends AbstractScript {
                         tree = getGameObjects().closest(gameObject -> (treeDistance <= 0 || gameObject.distance(startTile) < treeDistance) && gameObject.getName().equalsIgnoreCase(woodList.get(Calculations.random(woodList.size()))));
                     }
 
-                    if (getRandomManager().isSolving()) {
+                    if (isStandingStill()) {
                         chopping = false;
                         tree = null;
+                        standingStill = 0;
                     }
 
                     if (tree != null && !chopping && !getLocalPlayer().isMoving() && tree.interact("Chop down")) {
@@ -136,7 +139,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                 }
                 break;
             case DROP_OR_BANK:
-                log("DROP_OR_BANK");
+                if (DEBUG) log("DROP_OR_BANK");
                 if (isStarted) {
                     if (drop)
                         currentState = BotStates.DROP;
@@ -145,7 +148,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                 }
                 break;
             case DROP:
-                log("DROP");
+                if (DEBUG) log("DROP");
                 if (isStarted) {
                     Utilities.OpenTab(this, Tab.INVENTORY);
                     getInventory().dropAllExcept(item -> !item.getName().toLowerCase().contains("log"));
@@ -153,7 +156,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                 }
                 break;
             case BANK:
-                log("BANK");
+                if (DEBUG) log("BANK");
                 if (isStarted) {
                     destinationArea = getBank().getClosestBankLocation().getArea(1);
                     if (!destinationArea.contains(getLocalPlayer())) {
@@ -167,7 +170,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                 }
                 break;
             case WALK_TO_BANK:
-                log("WALK_TO_BANK");
+                if (DEBUG) log("WALK_TO_BANK");
                 if (isStarted) {
                     if (!destinationArea.contains(getLocalPlayer())) {
                         Utilities.GoToArea(this, getBank().getClosestBankLocation().getArea(1));
@@ -177,7 +180,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                 }
                 break;
             case WALK_FROM_BANK:
-                log("WALK_FROM_BANK");
+                if (DEBUG) log("WALK_FROM_BANK");
                 if (isStarted) {
                     if (!(previousTile.distance(getLocalPlayer().getTile()) < 2)) {
                         Utilities.GoToTile(this, previousTile);
@@ -197,7 +200,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
         }
 
         if (getDialogues().canContinue()) {
-            log("In dialogue");
+            if (DEBUG) log("In dialogue");
             getDialogues().spaceToContinue();
         }
 
@@ -212,6 +215,17 @@ public class GanjaWoodcutterMain extends AbstractScript {
             botGUI.DrawInGameGUI(g);
             g.dispose();
         }
+    }
+
+    private boolean isStandingStill() {
+
+        if (!getLocalPlayer().isAnimating()) {
+            standingStill++;
+        } else {
+            standingStill = 0;
+        }
+
+        return standingStill > 35;
     }
 
     @Override
