@@ -17,7 +17,7 @@ import org.dreambot.api.wrappers.items.GroundItem;
 
 @ScriptManifest(author = "GanjaSmuggler", category = Category.WOODCUTTING, name = "Ganja Woodcutter", description = "Chop any tree anywhere. Just start and fill the blank with tree names (e.g. Oak ,Willow ,Yew) then choose either drop or bank.", version = 1.0)
 public class GanjaWoodcutterMain extends AbstractScript {
-    public static final String VERSION = "2.3.7";
+    public static final String VERSION = "2.3.8";
     public static boolean DEBUG = false;
 
     private boolean isStarted = false;
