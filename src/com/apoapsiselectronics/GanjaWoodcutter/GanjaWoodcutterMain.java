@@ -93,7 +93,7 @@ public class GanjaWoodcutterMain extends AbstractScript {
                     }
 
                     if (!chopping) {
-                        tree = getGameObjects().closest(gameObject -> (treeDistance <= 0 || gameObject.distance(startTile) < treeDistance) && gameObject.getName().equalsIgnoreCase(woodList.get(Calculations.random(woodList.size()))));
+                        tree = getGameObjects().closest(gameObject -> (treeDistance <= 0 || gameObject.distance(startTile) < treeDistance) && gameObject.getName().equalsIgnoreCase(woodList.get(Calculations.random(woodList.size()))) && getMap().canReach(gameObject));
                     }
 
                     if (isStandingStill()) {
