@@ -2,3 +2,8 @@
 *.iml
 out
 gen
+bin/
+libs/
+.classpath
+.project
+
